@@ -17,23 +17,25 @@ AGraph::AGraph(const Json::Value& config, const std::string& name, const std::st
     : AModule(config, name, id,
               config["format-alt"].isString() || config["menu"].isString() || enable_click,
               enable_scroll),
+      box_(Gtk::ORIENTATION_HORIZONTAL, 0),
       interval_(config_["interval"] == "once"
                     ? std::chrono::seconds::max()
                     : std::chrono::seconds(
                           config_["interval"].isUInt() ? config_["interval"].asUInt() : interval)) {
-  graph_.signal_draw().connect(sigc::mem_fun(*this, &AGraph::onDraw));
-  graph_.set_name(name);
+  box_.set_name(name);
   if (!id.empty()) {
-    graph_.get_style_context()->add_class(id);
+    box_.get_style_context()->add_class(id);
   }
-  graph_.get_style_context()->add_class(MODULE_CLASS);
+  box_.get_style_context()->add_class(MODULE_CLASS);
+  box_.add(graph_);
+  event_box_.add(box_);
+
+  graph_.signal_draw().connect(sigc::mem_fun(*this, &AGraph::onDraw));
   if (config_["width"].isUInt()) {
     graph_.set_size_request(config_["width"].asUInt(), -1);
   } else {
     graph_.set_size_request(100, -1);
   }
-
-  event_box_.add(graph_);
 
   if (config_["datapoints"].isUInt() && config_["datapoints"].asUInt() > 0) {
     datapoints_ = config_["datapoints"].asUInt();
@@ -124,7 +126,7 @@ bool AGraph::onDraw(const Cairo::RefPtr<Cairo::Context>& cr) {
     return false;
   }
 
-  auto style_context = graph_.get_style_context();
+  auto style_context = box_.get_style_context();
   Gdk::RGBA fg_color = style_context->get_color(Gtk::STATE_FLAG_NORMAL);
   Gdk::RGBA bg_color = fg_color;
   bg_color.set_alpha(0.3);

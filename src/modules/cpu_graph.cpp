@@ -28,7 +28,12 @@ auto waybar::modules::CpuGraph::update() -> void {
     graph_.set_tooltip_text(tooltip);
   }
   auto total_usage = cpu_usage.empty() ? 0 : cpu_usage[0];
-  addValue(total_usage);
+
+  if (config_["core"].isInt()) {
+    addValue(cpu_usage[config_["core"].asInt()]);
+  } else {
+    addValue(total_usage);
+  }
 
   graph_.get_style_context()->remove_class(MODERATE_CLASS);
   graph_.get_style_context()->remove_class(HIGH_CLASS);
