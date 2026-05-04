@@ -37,6 +37,10 @@ Addressed by *custom-graph/<name>*
 	You can update it manually with a signal. If no *interval* or *signal* is defined, it is assumed that the out script loops itself. ++
 	If a *signal* is defined then the script will run once on startup and will only update with a signal.
 
+*graph_type*: ++
+	typeof: string ++
+	What type of graph to show. Can be *line* (default), *bar* or *gauge*.
+
 *restart-interval*: ++
 	typeof: integer or float ++
 	The restart interval (in seconds). ++

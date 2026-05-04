@@ -6,7 +6,7 @@ waybar - cpu graph module
 
 # DESCRIPTION
 
-The *cpu graph* module displays a line graph with the CPU utilization.
+The *cpu graph* module displays a graph with the CPU utilization.
 
 # CONFIGURATION
 
@@ -22,6 +22,10 @@ The *cpu graph* module displays a line graph with the CPU utilization.
 *datapoints*: ++
 	typeof: integer ++
 	How many data points to show.
+
+*graph_type*: ++
+	typeof: string ++
+	What type of graph to show. Can be *line* (default), *bar* or *gauge*.
 
 *on-click*: ++
 	typeof: string  ++
