@@ -39,7 +39,7 @@ Addressed by *custom-graph/<name>*
 
 *graph_type*: ++
 	typeof: string ++
-	What type of graph to show. Can be *line* (default), *bar* or *gauge*.
+	What type of graph to show. Can be *line* (default), *bar*, *bar-vertical*, *bar-horizontal* or *gauge*.
 
 *restart-interval*: ++
 	typeof: integer or float ++

@@ -224,16 +224,16 @@ void AGraph::drawBars(const Cairo::RefPtr<Cairo::Context>& cr, double width, dou
   double yellow_height = height * (std::min(current_value, 75) - 40) / 100.0;
   double orange_height = height * (std::min(current_value, 85) - 75) / 100.0;
   double red_height = height * (current_value - 85) / 100.0;
-  double green_width = width * (std::min(current_value, 40) / 100.0);
-  double yellow_width = width * (std::min(current_value, 75) - 40) / 100.0;
-  double orange_width = width * (std::min(current_value, 85) - 75) / 100.0;
-  double red_width = width * (current_value - 85) / 100.0;
+  double green_width = std::max(.0, width * (std::min(current_value, 40) / 100.0));
+  double yellow_width = std::max(.0, width * (std::min(current_value, 75) - 40) / 100.0);
+  double orange_width = std::max(.0, width * (std::min(current_value, 85) - 75) / 100.0);
+  double red_width = std::max(.0, width * (current_value - 85) / 100.0);
   double value_height = height * (current_value / 100.0);
   double value_width = width * (current_value / 100.0);
 
   cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 0.5);
   if(horizontal) {
-    cr->rectangle(width - green_width, 0, green_width, height);
+    cr->rectangle(0, 0, green_width, height);
   } else {
     cr->rectangle(0, height - green_height, width, green_height);
   }
@@ -242,7 +242,7 @@ void AGraph::drawBars(const Cairo::RefPtr<Cairo::Context>& cr, double width, dou
   if (current_value > 40) {
     cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 0.7);
 	if (horizontal) {
-  	  cr->rectangle(width - green_width - yellow_width, 0, yellow_width, height);
+  	  cr->rectangle(green_width, 0, yellow_width, height);
 	} else {
       cr->rectangle(0, height - green_height - yellow_height, width, yellow_height);
     }
@@ -251,9 +251,9 @@ void AGraph::drawBars(const Cairo::RefPtr<Cairo::Context>& cr, double width, dou
 
   if (current_value > 75) {
     cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 0.85);
-	if (horizontal) {
-  	  cr->rectangle(width - green_width - yellow_width - orange_width, 0, orange_width, height);
-	} else {
+    if (horizontal) {
+      cr->rectangle(green_width + yellow_width, 0, orange_width, height);
+    } else {
       cr->rectangle(0, height - green_height - yellow_height - orange_height, width, orange_height);
     }
     cr->fill();
@@ -261,18 +261,18 @@ void AGraph::drawBars(const Cairo::RefPtr<Cairo::Context>& cr, double width, dou
 
   if (current_value > 85) {
     cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 1.0);
-	if (horizontal) {
-  	  cr->rectangle(width - green_width - yellow_width - orange_width - red_height, 0, red_width, height);
-	} else {
+    if (horizontal) {
+      cr->rectangle(green_width + yellow_width + orange_width, 0, red_width, height);
+    } else {
       cr->rectangle(0, height - green_height - yellow_height - orange_height - red_height, width, red_height);
-	}
+	  }
     cr->fill();
   }
 
   cr->set_source_rgba(0.2, 0.2, 0.2, 0.8);
 
   if (horizontal) {
-    cr->rectangle(width - value_width, 0, height, 2);
+    cr->rectangle(value_width, 0, 2, height);
   } else {
     cr->rectangle(0, height - value_height, width, 2);
   }

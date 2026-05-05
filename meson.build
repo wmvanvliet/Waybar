@@ -193,6 +193,7 @@ src_files = files(
 
 man_files = files(
     'man/waybar-custom.5.scd',
+    'man/waybar-custom-graph.5.scd',
     'man/waybar-disk.5.scd',
     'man/waybar-idle-inhibitor.5.scd',
     'man/waybar-image.5.scd',
@@ -227,6 +228,7 @@ if is_linux
         'man/waybar-bluetooth.5.scd',
         'man/waybar-cffi.5.scd',
         'man/waybar-cpu.5.scd',
+        'man/waybar-cpu-graph.5.scd',
         'man/waybar-memory.5.scd',
         'man/waybar-systemd-failed-units.5.scd',
         'man/waybar-power-profiles-daemon.5.scd',
