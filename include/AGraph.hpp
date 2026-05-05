@@ -11,7 +11,7 @@
 
 namespace waybar {
 
-enum class GraphType { LINE, BAR, GAUGE };
+enum class GraphType { LINE, BAR, HBAR, GAUGE };
 
 class AGraph : public AModule {
  public:
@@ -50,7 +50,7 @@ class AGraph : public AModule {
 
   void drawBars(const Cairo::RefPtr<Cairo::Context> &cr,
                 double width, double height, int current_value,
-                const Gdk::RGBA &fg_color);
+                const Gdk::RGBA &fg_color, bool horizontal);
 
   void drawGauge(const Cairo::RefPtr<Cairo::Context> &cr, double width, double height,
                  int current_value, const Gdk::RGBA &fg_color);

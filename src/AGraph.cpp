@@ -45,8 +45,10 @@ AGraph::AGraph(const Json::Value& config, const std::string& name, const std::st
     std::string type = config_["graph_type"].asString();
     if (type == "line") {
       graph_type_ = GraphType::LINE;
-    } else if (type == "bar") {
+    } else if (type == "bar" || type == "bar-vertical") {
       graph_type_ = GraphType::BAR;
+    } else if (type == "bar-horizontal") {
+      graph_type_ = GraphType::HBAR;
     } else if (type == "gauge") {
       graph_type_ = GraphType::GAUGE;
     }
@@ -147,6 +149,7 @@ bool AGraph::onDraw(const Cairo::RefPtr<Cairo::Context>& cr) {
     double y = height - (static_cast<double>(value) / 100.0 * height);
     points.emplace_back(x, y);
   }
+
   if (!points.empty()) {
     switch (graph_type_) {
       case GraphType::LINE:
@@ -154,7 +157,10 @@ bool AGraph::onDraw(const Cairo::RefPtr<Cairo::Context>& cr) {
         drawLine(cr, points, fg_color);
         break;
       case GraphType::BAR:
-        drawBars(cr, width, height, values_.empty() ? 0 : values_.back(), fg_color);
+        drawBars(cr, width, height, values_.empty() ? 0 : values_.back(), fg_color, false);
+        break;
+      case GraphType::HBAR:
+        drawBars(cr, width, height, values_.empty() ? 0 : values_.back(), fg_color, true);
         break;
       case GraphType::GAUGE:
         drawGauge(cr, width, height, values_.empty() ? 0 : values_.back(), fg_color);
@@ -212,42 +218,64 @@ void AGraph::drawPath(const Cairo::RefPtr<Cairo::Context>& cr,
 }
 
 void AGraph::drawBars(const Cairo::RefPtr<Cairo::Context>& cr, double width, double height,
-                      int current_value, const Gdk::RGBA& fg_color) {
+                      int current_value, const Gdk::RGBA& fg_color, bool horizontal) {
   current_value = std::min(100, std::max(0, current_value));
-
   double green_height = height * (std::min(current_value, 40) / 100.0);
+  double yellow_height = height * (std::min(current_value, 75) - 40) / 100.0;
+  double orange_height = height * (std::min(current_value, 85) - 75) / 100.0;
+  double red_height = height * (current_value - 85) / 100.0;
+  double green_width = width * (std::min(current_value, 40) / 100.0);
+  double yellow_width = width * (std::min(current_value, 75) - 40) / 100.0;
+  double orange_width = width * (std::min(current_value, 85) - 75) / 100.0;
+  double red_width = width * (current_value - 85) / 100.0;
+  double value_height = height * (current_value / 100.0);
+  double value_width = width * (current_value / 100.0);
+
   cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 0.5);
-  cr->rectangle(0, height - green_height, width, green_height);
+  if(horizontal) {
+    cr->rectangle(width - green_width, 0, green_width, height);
+  } else {
+    cr->rectangle(0, height - green_height, width, green_height);
+  }
   cr->fill();
 
   if (current_value > 40) {
-    double yellow_height = height * (std::min(current_value, 75) - 40) / 100.0;
     cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 0.7);
-    cr->rectangle(0, height - green_height - yellow_height, width, yellow_height);
+	if (horizontal) {
+  	  cr->rectangle(width - green_width - yellow_width, 0, yellow_width, height);
+	} else {
+      cr->rectangle(0, height - green_height - yellow_height, width, yellow_height);
+    }
     cr->fill();
   }
 
   if (current_value > 75) {
-    double orange_height = height * (std::min(current_value, 85) - 75) / 100.0;
     cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 0.85);
-    double yellow_height = height * (std::min(current_value, 75) - 40) / 100.0;
-    cr->rectangle(0, height - green_height - yellow_height - orange_height, width, orange_height);
+	if (horizontal) {
+  	  cr->rectangle(width - green_width - yellow_width - orange_width, 0, orange_width, height);
+	} else {
+      cr->rectangle(0, height - green_height - yellow_height - orange_height, width, orange_height);
+    }
     cr->fill();
   }
 
   if (current_value > 85) {
-    double red_height = height * (current_value - 85) / 100.0;
     cr->set_source_rgba(fg_color.get_red(), fg_color.get_green(), fg_color.get_blue(), 1.0);
-    double yellow_height = height * (std::min(current_value, 75) - 40) / 100.0;
-    double orange_height = height * (std::min(current_value, 85) - 75) / 100.0;
-    cr->rectangle(0, height - green_height - yellow_height - orange_height - red_height, width,
-                  red_height);
+	if (horizontal) {
+  	  cr->rectangle(width - green_width - yellow_width - orange_width - red_height, 0, red_width, height);
+	} else {
+      cr->rectangle(0, height - green_height - yellow_height - orange_height - red_height, width, red_height);
+	}
     cr->fill();
   }
 
-  double value_height = height * (current_value / 100.0);
   cr->set_source_rgba(0.2, 0.2, 0.2, 0.8);
-  cr->rectangle(0, height - value_height, width, 2);
+
+  if (horizontal) {
+    cr->rectangle(width - value_width, 0, height, 2);
+  } else {
+    cr->rectangle(0, height - value_height, width, 2);
+  }
   cr->fill();
 }
 

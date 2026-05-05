@@ -1,8 +1,6 @@
 #include "modules/cpu_graph.hpp"
 
-#include "modules/cpu_frequency.hpp"
 #include "modules/cpu_usage.hpp"
-#include "modules/load.hpp"
 
 // In the 80000 version of fmt library authors decided to optimize imports
 // and moved declarations required for fmt::dynamic_format_arg_store in new
